@@ -1,10 +1,8 @@
 package main
 
 import (
-	"context"
 	"crypto/ecdsa"
 	"fmt"
-	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -15,7 +13,6 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/eth/tracers"
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
@@ -121,28 +118,18 @@ func executeSwapTransaction(client *ethclient.Client) error {
 
 	fmt.Printf("Transaction sent: %s\n", tx.Hash().Hex())
 
-	return traceCall(client, auth, tx)
+	return traceTransaction(client, tx)
 }
 
-func traceCall(client *ethclient.Client, auth *bind.TransactOpts, tx *types.Transaction) error {
-	msg := ethereum.CallMsg{
-		From:     auth.From,
-		To:       tx.To(),
-		Gas:      tx.Gas(),
-		GasPrice: tx.GasPrice(),
-		Value:    tx.Value(),
-		Data:     tx.Data(),
-	}
+func traceTransaction(client *ethclient.Client, tx *types.Transaction) error {
+	fmt.Println("Waiting for transaction to be mined...")
+	time.Sleep(12 * time.Second) // wait for the transaction to be mined
 
-	tracerString := "callTracer"
-	traceConfig := &tracers.TraceConfig{
-		Tracer: &tracerString,
-	}
-
+	// do trace_transaction
 	var traceResult interface{}
-	err := client.Client().CallContext(context.Background(), &traceResult, "debug_traceCall", msg, "latest", traceConfig)
+	err := client.Client().Call(&traceResult, "trace_transaction", tx.Hash().Hex())
 	if err != nil {
-		log.Fatalf("Failed to trace call: %v", err)
+		log.Fatalf("Failed to trace transaction: %v", err)
 	}
 
 	fmt.Printf("Trace result: %v\n", traceResult)
