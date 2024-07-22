@@ -10,3 +10,4 @@ Demonstrating an EVM simulation including tracing against a forked Ethereum main
 - ABI binding generated using abigen, `abigen --abi=uniswap_v2_router.abi --out=uniswap_v2_router/uniswap_v2_router.go --pkg=uniswap_v2_router` 
 - Infura API key is HARD CODED in the `main.go` file for demonstration purposes. It's on a free account, but will be deleting soon after this repo is done with
 - run using `go run main.go`. If doesn't work, do `go get` just in case ;)
+- The code forks Ethereum mainnet using Infura, and simulates a simple ETH->USDC swap and prints its trace
